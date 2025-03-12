@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaTimes, FaBars } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { logoutUser } from '../Slice/authSlice';
 
 function AdminNavbar() {
     const navigate = useNavigate();
+    const dispatch = useDispatch()
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const handleLogout = () => {
         console.log('User logged out');
-        navigate('/');
+        dispatch(logoutUser())
+        navigate('/login');
     };
 
     return (

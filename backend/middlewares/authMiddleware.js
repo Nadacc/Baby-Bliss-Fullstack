@@ -4,7 +4,9 @@ const { verifyToken } = require("../utils/jwt")
 
 const authenticate=async(req,res,next)=>{
     try{
-        // console.log(req.cookies)
+        console.log("Cookies received:", req.cookies);
+        console.log("Access token:", req.cookies.accessToken);
+
         const token=req.cookies.accessToken
         if(!token){
             throw new CustomError("Access token is missing",401)

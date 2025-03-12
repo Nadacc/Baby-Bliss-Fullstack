@@ -4,19 +4,22 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useNavigate } from 'react-router-dom';
 import { fetchUserDetails } from '../Slice/authSlice';
+import { logoutUser } from '../Slice/authSlice';
+import { toast } from "react-toastify";
+
 
 function Navbar() {
   
   const [search, setSearch] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isLoggedIn,setIsloggedIn]=useState(false);
+  //const [isLoggedIn,setIsloggedIn]=useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { user } = useSelector((state) => state.auth);
   //const username = localStorage.getItem('username');
-  const cartCount = useSelector(state => state.shop.cartCount)
+  const cart = useSelector(state => state.shop.cart)
 
   useEffect(() => {
     dispatch(fetchUserDetails());
@@ -38,13 +41,19 @@ function Navbar() {
     navigate('/login');
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('id');
-    localStorage.removeItem('username');
-    // setCartCount(0);
-    setIsloggedIn(false);
-    setIsMenuOpen(false)
-    navigate('/'); 
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap()
+    
+      .then((response) =>
+        navigate('/')
+      )
+      window.location.reload()
+      toast.success("Logout successfully")
+
+    } catch (error) {
+      toast.error("Error during logout");
+    }
   };
 
   return (
@@ -92,9 +101,9 @@ function Navbar() {
           
           <div className="relative cursor-pointer" onClick={() => navigate('/cart')}>
             <FaShoppingBasket />
-            {cartCount > 0 && (
+            {cart.length > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-sm w-5 h-5 flex items-center justify-center rounded-full">
-                {cartCount}
+                {cart?.length}
               </span>
             )}
           </div>
@@ -168,7 +177,7 @@ function Navbar() {
                 <FaHeart className="mr-2" /> Wishlist
               </button>
               <button onClick={() => navigate('/cart')} className="flex items-center w-full">
-                <FaShoppingBasket className="mr-2" /> Cart ({cartCount})
+                <FaShoppingBasket className="mr-2" /> Cart ({cart.length})
               </button>
               <button onClick={handleOrders} className="flex items-center w-full">
                 <FaUser className="mr-2" /> Orders

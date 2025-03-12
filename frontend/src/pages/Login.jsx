@@ -12,54 +12,13 @@ import { setUser } from '../Slice/authSlice';
 function Login() {
     const navigate=useNavigate();
     const dispatch = useDispatch();
-    const initialValues =  {
+
     
+    const initialValues =  {
         email:'',
         password:''
-        
     }
     
-    // const onSubmit = async(values) =>{
-    //     // console.log("form data",values);
-    
-    //     try{
-    //         if(values.email ==='ccnada15@gmail.com' && values.password ==='N_ada_15'){
-    //           dispatch(setLoggedIn(true));
-    //           navigate('/admin');
-    //         }
-    //         else{
-    //           const response=await axios.get('http://localhost:5000/users')
-    //         console.log(response);
-            
-    //         const user = response.data.find(
-    //             (u) => u.email === values.email && u.password === values.password
-    //           );
-            
-    //         if(user) {
-    //           if(!user.status){
-    //             toast.error("You are blocked")
-    //             return;
-    //           }
-    //             toast.success('Login successful!');
-    //             localStorage.setItem("id",user.id);
-    //             localStorage.setItem("username",user.username)
-    //             navigate('/'); 
-    //           } 
-    //           else {
-    //             toast.error('Invalid email or password. Please try again.');
-    //           }
-            
-    //         }
-    //       }
-    //     catch(error){
-    //         console.log('login error',error)
-    //         toast.error('An error occur.Please try again')
-    //       }
-        
-    // }
-
-
-
 
     const onSubmit = async (values,{resetForm}) => {
       try{
@@ -71,6 +30,8 @@ function Login() {
     
         setUser(response.data.user.name);
         console.log(response.data,"data")
+        //toast.success(response.data.message);
+
         const userRole=response.data.user.isAdmin ?'admin':'user'
         console.log(userRole)
 

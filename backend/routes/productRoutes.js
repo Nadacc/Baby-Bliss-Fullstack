@@ -4,8 +4,8 @@ const { getallProducts,singleProduct} = require('../controllers/productControlle
 const router=express.Router()
 
 
-router.get('/products',getallProducts)//getallproduct
-router.get('/products/:id',singleProduct) //get single
+router.get('/products',getallProducts)
+router.get('/products/:id',singleProduct) 
 
 
 module.exports=router

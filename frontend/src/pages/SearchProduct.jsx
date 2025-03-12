@@ -7,6 +7,9 @@ import Navbar from '../components/Navbar';
 import { AiFillHeart, AiOutlineHeart } from 'react-icons/ai';
 import { IoMdClose } from 'react-icons/io';
 import { toast } from 'react-toastify';
+import { fetchUserDetails } from '../Slice/authSlice';
+
+
 
 function SearchProduct() {
     const location = useLocation();
@@ -18,13 +21,16 @@ function SearchProduct() {
 
     const [filtered, setFiltered] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
+    const [wishlistItems, setWishlistItems] = useState([]);
 
     const openModal = (product) => setSelectedProduct(product);
     const closeModal = () => setSelectedProduct(null);
 
+    const { user } = useSelector(state => state.auth);
     useEffect(() => {
-        dispatch(FetchProducts());
-    }, [dispatch]);
+        dispatch(FetchProducts({page:1,search:result}));
+        dispatch(fetchUserDetails())
+    }, [dispatch,result]);
 
     useEffect(() => {
         if (products.length > 0) {
@@ -35,6 +41,40 @@ function SearchProduct() {
             setFiltered(filteredProducts);
         }
     }, [products, result]);
+
+    useEffect(() => {
+            setWishlistItems(wishlist.map(item => item._id)); // Store only product IDs
+        }, [wishlist]);
+
+    const handleAddToCart = (product) => {
+        if (user) {
+            dispatch(addToCart(product._id));
+            toast.success("Added to cart successfully");
+            
+        } else {
+            toast.error("Please login");
+        }
+    };
+
+    const handleWishlist = (product) => {
+            if(!user){
+                toast.error("Please login")
+                return;
+            }
+            const isInWishlist = wishlistItems.includes(product._id);
+    
+        if (isInWishlist) {
+            setWishlistItems(prev => prev.filter(id => id !== product._id)); 
+            dispatch(removeFromWishlist(product._id))
+                .then(() => toast.success("Removed from wishlist"))
+                .catch(() => toast.error("Failed to remove"));
+        } else {
+            setWishlistItems(prev => [...prev, product._id]);
+            dispatch(addToWishlist(product._id))
+                .then(() => toast.success("Added to wishlist"))
+                .catch(() => toast.error("Failed to add"));
+        }
+        }
 
     return (
         <div className="bg-blue-50 min-h-screen">
@@ -61,27 +101,17 @@ function SearchProduct() {
                                         className="bg-green-500 text-white px-4 sm:px-6 py-2 rounded-lg shadow-md hover:bg-green-600 text-sm sm:text-base"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            const id = localStorage.getItem("id");
-                                            if (!id) {
-                                                toast.error("User not logged in.");
-                                                return;
-                                            }
-                                            dispatch(addToCart({ product, userId: id }));
+                                            handleAddToCart(product)
                                         }}
                                     >
                                         Add to Cart
                                     </button>
-                                    {isInWishlist ? (
+                                    {wishlistItems.includes(product._id) ? (
                                         <AiFillHeart
                                             className="w-6 h-6 text-red-500 cursor-pointer"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                const id = localStorage.getItem("id");
-                                                if (!id) {
-                                                    toast.error("User not logged in.");
-                                                    return;
-                                                }
-                                                dispatch(removeFromWishlist({ productId: product.id, userId: id }));
+                                                handleWishlist(product)
                                             }}
                                         />
                                     ) : (
@@ -89,12 +119,7 @@ function SearchProduct() {
                                             className="w-6 h-6 cursor-pointer"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                const id = localStorage.getItem("id");
-                                                if (!id) {
-                                                    toast.error("User not logged in.");
-                                                    return;
-                                                }
-                                                dispatch(addToWishlist({ product, userId: id }));
+                                                handleWishlist(product)
                                             }}
                                         />
                                     )}
@@ -121,20 +146,37 @@ function SearchProduct() {
                         <p className="text-gray-600 mb-4">
                             {selectedProduct.description || "No description available."}
                         </p>
-                        <button
-                            className="bg-green-500 text-white px-4 sm:px-6 py-2 rounded-lg shadow-md hover:bg-green-600 text-sm sm:text-base"
-                            onClick={() => {
-                                const id = localStorage.getItem("id");
-                                if (!id) {
-                                    toast.error("User not logged in.");
-                                    return;
-                                }
-                                dispatch(addToCart({ product: selectedProduct, userId: id }));
-                                closeModal();
-                            }}
-                        >
-                            Add to Cart
-                        </button>
+                        <div className="flex items-center justify-center mb-4 gap-4 px-4">
+                            <button
+                                className="bg-green-500 text-white px-4 sm:px-6 py-2 rounded-lg shadow-md hover:bg-green-600 text-sm sm:text-base"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleAddToCart(selectedProduct);
+                                    //closeModal();
+                                }}
+                            >
+                                Add to Cart
+                            </button>
+                            {wishlistItems.includes(selectedProduct._id) ? (
+                                <AiFillHeart
+                                    className="w-6 h-6 text-red-500 cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleWishlist(selectedProduct);
+                                        //closeModal();
+                                    }}
+                                />
+                            ) : (
+                                <AiOutlineHeart
+                                    className="w-6 h-6 cursor-pointer"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleWishlist(selectedProduct);
+                                        //closeModal();
+                                    }}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

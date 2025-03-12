@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify';
 import { Form,ErrorMessage, Field, Formik } from "formik";
@@ -7,7 +6,9 @@ import * as Yup from 'yup';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useSelector, useDispatch } from 'react-redux';
+import { addOrder,verifypayment } from '../Slice/orderSlice';
 import { clearCart } from '../Slice/ShopSlice';
+//import { clearCart } from '../Slice/ShopSlice';
 
 function Order() {
 
@@ -28,29 +29,80 @@ function Order() {
 
     const totalprice = cart.reduce((acc, item) => acc + (item.quantity * item.price), 0);
 
-    const onSubmit = async (values) => {
-      const userId = localStorage.getItem('id');
-      console.log("User ID from localStorage:", userId);
-      const order = {
-          ...values,
-          items: cart,
-          total: totalprice,
+
+
+    const openRazorpayPayment = (razorpayOrderId, amount, name) => {
+      console.log("Opening Razorpay with Order ID:", razorpayOrderId);
+
+
+
+      const options = {
+        key: "rzp_test_GcYeDXpTqSAVpK",
+        amount: amount,
+        currency: "INR",
+        name: "BabyBliss",
+        description: "Product Payment",
+        order_id: razorpayOrderId,
+        handler: (response) => {
+          console.log("Razorpay Payment Response:", response);
+
+
+          const paymentData = {
+            paymentId: response.razorpay_payment_id,
+            orderId:razorpayOrderId
+            
+          };
+          console.log("Sending Payment Data:", paymentData);
+
+
+          dispatch(verifypayment(paymentData))
+        .unwrap()
+        .then((res) => {
+          
+          navigate("/");
+          dispatch(clearCart())
+        })
+        .catch((error) => {
+          
+          toast.error("Payment verification failed. Try again.");
+        });
+        },
+        prefill: {
+          name: name,
+        },
+        theme: {
+          color: "#F37254",
+        },
       };
-      // console.log("Order Data:", order);
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    }
+
+
+
+    const onSubmit = async (values) => {
+      // const userId = localStorage.getItem('id');
+      // console.log("User ID from localStorage:", userId);
       
       try {
-          const response = await axios.get(`http://localhost:5000/users/${userId}`);
-          const oldOrders = response.data.order || []; // Use an empty array if undefined
-  
+        const orderData = {
+            id:Date.now(),
+            ...values,
+            items: cart,
+            total: totalprice,
+            paymentMethod:"razorpay"
+        };
+        // console.log("Order Data:", order);
+          const response = await dispatch(addOrder(orderData)).unwrap();
+          console.log("Full Backend Response:", response);
+
           
-          await axios.patch(`http://localhost:5000/users/${userId}`, {
-              order: [...oldOrders, order], // Append new order to existing ones
-              cart: [], 
-          });
-          
-          
-          toast.success('Order placed successfully');
-          dispatch(clearCart())
+
+          const {razorpayOrderId,amount} = response; 
+   
+          console.log("Opening Razorpay with Order ID:", razorpayOrderId);
+          openRazorpayPayment(razorpayOrderId, amount, values.name);
+          //dispatch(clearCart())
           
           setTimeout(() => {
             toast.dismiss();
@@ -59,7 +111,7 @@ function Order() {
           
       } catch (error) {
           console.error('Order submission failed:', error);
-          toast.error('Failed to place order');
+          toast.error(error || 'Failed to place order');
       }
   };
 
@@ -110,7 +162,7 @@ function Order() {
                   ))}
                 </div>
                 <div className="mt-4 font-semibold text-xl text-gray-800">
-                  <span>Total: ₹{totalprice}</span>
+                  <span><strong>Total: ₹{totalprice}</strong></span>
                 </div>
             </div>
             <div>
@@ -119,7 +171,8 @@ function Order() {
             
 
             <div className="flex justify-center mt-6">
-                <button type='submit' className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">Submit Order</button>
+                <button type='submit' className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                  Proceed to Payment</button>
             </div>
             </Form>
             </Formik>

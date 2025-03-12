@@ -71,6 +71,7 @@ exports.deleteCartServices=async(productId,userId)=>{
 
 
 exports.updateCartQuantityService = async (productId, userId, action) => {
+    console.log("Update Request:", { productId, userId, action }); 
     const cart = await Cart.findOne({ user: userId });
 
     if (!cart) {

@@ -1,6 +1,10 @@
 const asyncHandler = require("../utils/asyncHandler");
 const STATUS = require("../utils/constants");
-const {getAllUserService,singleUserService,userBlockService,totalRevenueService} = require("../services/adminService");
+const {getAllUserService,
+      singleUserService,
+      userBlockService,
+      totalRevenueService,
+      showOrderServices} = require("../services/adminService");
 
 
 exports.allUsers = asyncHandler(async (req, res) => {
@@ -44,5 +48,23 @@ exports.totalRevenue = asyncHandler(async (req, res) => {
     message: "Total Revenue and Purchased Products",
     totalRevenue,
     totalPurchasedProducts,
+  });
+});
+
+
+
+exports.getUserOrder = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { page } = req.query; 
+  const { orders,pagination} = await showOrderServices(id,parseInt(page, 10) || 1, 10 );
+  const message = orders.length 
+    ? "Orders retrieved successfully" 
+    : "No orders found";
+  res.status(200).json({
+    status: STATUS.SUCCESS,
+    message,
+    orders,
+    pagination
+
   });
 });

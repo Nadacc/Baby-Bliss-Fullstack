@@ -43,14 +43,14 @@ function App() {
 
 
 
-          <Route path='/admin' element={<AdminProtected><AdminHome/></AdminProtected>}/>
+          {/* <Route path='/admin' element={<AdminProtected><AdminHome/></AdminProtected>}/>
           <Route path='/adminproduct' element={<AdminProtected><AdminProduct/></AdminProtected>}/>
-          <Route path='/adminuser' element={<AdminProtected><AdminUser/></AdminProtected>}/>
+          <Route path='/adminuser' element={<AdminProtected><AdminUser/></AdminProtected>}/> */}
 
 
-          {/* <Route path='/admin' element={<AdminHome/>}/>
+          <Route path='/admin' element={<AdminHome/>}/>
           <Route path='/adminproduct' element={<AdminProduct/>}/>
-          <Route path='/adminuser' element={<AdminUser/>}/> */}
+          <Route path='/adminuser' element={<AdminUser/>}/>
 
         </Routes>
       

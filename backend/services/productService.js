@@ -1,37 +1,40 @@
 const products = require('../models/productModel')
 const CustomError = require('../utils/customError')
 
-exports.productService = async({search,category,page=1,limit=10,isAdmin}) => {
+exports.productService = async ({ search, category, page = 1, limit = 9, isAdmin }) => {
     const query = isAdmin ? {} : { isDelete: false };
-    if(category){
-        query.category = {$regex : `^${category}$`,$options:'i'}
+
+    if (category) {
+        query.category = { $regex: `^${category}$`, $options: 'i' };
     }
 
-
-
-    if(search){
-        query.$or=[
-            {name:{$regex:search,$options:'i'}},
-            {category:{$regex:search,$options:'i'}}
-        ]
+    if (search ) {
+        query.$or = [
+            { name: { $regex: search, $options: 'i' } },
+            { category: { $regex: search, $options: 'i' } }
+        ];
     }
-    
-    
-    const skip=(page-1)*limit
-    const total=await products.countDocuments(query)
-    const product=await products.find(query).skip(skip).limit(limit)
 
+    
+    const total = await products.countDocuments(query);
 
-    return{
-        product,
-        pagination:{
+    const paginatedProducts = await products
+        .find(query)
+        .skip((page - 1) * limit)
+        .limit(limit);
+
+    return {
+        product: paginatedProducts,
+        pagination: {
             total,
             page,
             limit,
-            totalPages:Math.ceil(total/limit)
-    }
-}
-}
+            totalPages: Math.ceil(total / limit),
+        },
+    };
+};
+
+
 
 exports.singleProductService = async(id,isAdmin) => {
     const query = isAdmin ? { _id: id } : { _id: id, isDelete: false };
@@ -74,10 +77,24 @@ exports.deleteProductService=async(productId)=>{
 
 
 exports.updateProductService=async(_id,updateItems)=>{
-    const existing=await products.findById(_id)
-    if(!existing){
-        throw new CustomError('product is unavailable',400)
+
+    try{
+        const updatedProduct = await products.findOneAndUpdate(
+            {_id},
+            { $set: { isDelete:false,...updateItems  }},
+            { new: true }
+        );
+    
+        if(!updatedProduct){
+            throw new CustomError('Product not found',404)
+        }
+    
+        return updatedProduct;
     }
-    const data=await products.findByIdAndUpdate({_id,isDelete:false},{ $set:{...updateItems}},{new:true})
-    return data
+    catch(error){
+        console.log('error in updating',error);
+        
+    }
+    
+
 }

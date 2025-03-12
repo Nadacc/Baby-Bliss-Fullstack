@@ -16,7 +16,7 @@ exports.getallProducts = asyncHandler(async(req,res) => {
     const {product,pagination} = await productService({
         category,
         page: parseInt(page, 10) || 1,
-        limit: 10,
+        limit: 9,
         search,
         isAdmin
     })
@@ -25,12 +25,14 @@ exports.getallProducts = asyncHandler(async(req,res) => {
         res.status(200).json({
             status:STATUS.SUCCESS,
             message:"no products found"
+            
         })
     }
     else{
             res.status(200).json({
             status:STATUS.SUCCESS,
             product,
+            totalProducts:pagination.total,
             pagination
         })
     }
@@ -105,10 +107,19 @@ exports.deleteProduct=asyncHandler(async(req,res)=>{
 
 
 exports.updateProduct=asyncHandler(async(req,res)=>{
-    const {_id,...updateItems}=req.body
-    if(!_id){
-        throw new CustomError('Product is not found')
+    const {id}=req.params;
+   
+    const updateItem = req.body
+
+    if (req.file) {
+        updateItem.image = req.file.path;
     }
-    const updateProduct=await updateProductService(_id,updateItems)
-    res.status(200).json({status:STATUS.SUCCESS,message:'Product updated successfully',updateProduct})
+
+    const updatedProduct = await updateProductService(id,updateItem)
+
+    res.status(200).json({
+        status:STATUS.SUCCESS,
+        message:'Product updated successfully',
+        updatedProduct,
+    })
 })

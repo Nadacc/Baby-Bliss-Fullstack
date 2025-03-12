@@ -21,7 +21,7 @@ exports.userRegisterServices = async(data) => {
         isAdmin:data.isAdmin || false
     });
     const savedUser = await newUser.save()
-    return savedUser
+    return savedUser._id
 }
 
 
@@ -66,4 +66,9 @@ exports.refreshAccessTokenService=async(refreshToken)=>{
 exports.getUserDetails = async(id) => {
     const user = await User.findById(id).select('username role');
     return user;
+}
+
+
+exports.logoutUserService = () => {
+    return true;
 }

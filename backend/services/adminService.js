@@ -51,3 +51,24 @@ exports.totalRevenueService = async () => {
     ? result[0]
     : { totalRevenue: 0, totalPurchasedProducts: 0 };
 };
+
+
+
+exports.showOrderServices = async (userId, page = 1, limit = 10) => {
+  const skip = (page - 1) * limit; 
+  const total = await Order.countDocuments({ user: userId });
+  const orders = await Order.find({ user: userId })
+    .populate({ path: 'items.productId', model: 'product' })
+    .skip(skip)
+    .limit(limit);
+
+  return {
+    orders,
+    pagination: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};

@@ -1,6 +1,6 @@
 const asyncHandler = require('../utils/asyncHandler')
 const STATUS = require('../utils/constants')
-const {userRegisterServices,userLoginServices, getUserDetails} = require('../services/userService')
+const {userRegisterServices,userLoginServices, getUserDetails,logoutUserService} = require('../services/userService')
 const {registerValidation} = require('../validation/userValidation')
 const User = require('../models/userModel')
 const CustomError = require('../utils/customError')
@@ -45,7 +45,7 @@ exports.loginUser = asyncHandler(async(req,res) => {
         .cookie("accessToken",accessToken,{
             httpOnly:true,
             secure:false,
-            maxAge:15*60*1000
+            maxAge:30*60*1000
         })
         .cookie("refreshToken",refreshToken,{
             httpOnly:true,
@@ -58,10 +58,7 @@ exports.loginUser = asyncHandler(async(req,res) => {
             message:User.isAdmin
                 ? "Admin Login successfully"
                 : "User Login successfully" ,
-            user:{name:User.name,
-                email:User.email,
-                isAdmin:User.isAdmin
-            }
+            user:User
         })
 })
 
@@ -91,5 +88,25 @@ exports.getLoggedInUser = asyncHandler(async(req,res) => {
         throw new CustomError('User not found',404);
     }
     res.status(200).json({user});
+})
+
+
+exports.logoutUser = asyncHandler(async(req,res) => {
+    await logoutUserService();
+
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: '/'
+    });
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: '/'
+    });
+  
+    res.status(200).json({ message: 'Logged out successfully' });
 })
   

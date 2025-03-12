@@ -38,8 +38,8 @@ exports.deleteWishlist = asyncHandler(async(req,res) => {
 exports.getWishlist=asyncHandler(async(req,res)=>{
     const userId=req.user._id
     const wishlist=await getWishlistService(userId)
-    if(wishlist.products.length===0){
-        res.status(200).json({status:STATUS.SUCCESS,message:'your wishlist is empty'})
+    if(!wishlist || wishlist.products.length===0){
+       res.status(200).json({status:STATUS.SUCCESS,message:'your wishlist is empty',wishlist:[]})
     }
     else{
         res.status(200).json({status:STATUS.SUCCESS,message:'wishlist...',wishlist})

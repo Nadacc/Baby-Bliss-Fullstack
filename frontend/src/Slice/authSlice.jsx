@@ -3,19 +3,19 @@ import axiosInstance from "../api/axiosInstance";
 
 const initialState = {};
 
-// export const logoutUser = createAsyncThunk(
-//     "auth/logoutUser",
-//     async (_, { rejectWithValue }) => {
-//       try {
-//         await axiosInstance.post(endPoints.AUTH.LOGOUT);
-//         return;
-//       } catch (error) {
-//         return rejectWithValue(
-//           error.response?.data?.message || "Error in logout"
-//         );
-//       }
-//     }
-//   );
+export const logoutUser = createAsyncThunk(
+    "auth/logoutUser",
+    async (_, { rejectWithValue }) => {
+      try {
+        await axiosInstance.post('/users/logout');
+        return;
+      } catch (error) {
+        return rejectWithValue(
+          error.response?.data?.message || "Error in logout"
+        );
+      }
+    }
+  );
 
 
 
@@ -53,23 +53,23 @@ export const fetchUserDetails = createAsyncThunk(
     },
     extraReducers: (builder) => {
       builder
-        // Logout User
-        // .addCase(logoutUser.pending, (state) => {
-        //   state.loading = true;
-        //   state.error = null;
-        // })
-        // .addCase(logoutUser.fulfilled, (state) => {
-        //   state.loading = false;
-        //   state.user = null;
-        //   state.isAuthenticated = false;
-        //   state.isAdmin = false;
-        //   state.error = null;
-        // })
-        // .addCase(logoutUser.rejected, (state, action) => {
-        //   state.loading = false;
-        //   state.error = action.payload;
-        // })
-        // Fetch User Details
+        //Logout User
+        .addCase(logoutUser.pending, (state) => {
+          state.loading = true;
+          state.error = null;
+        })
+        .addCase(logoutUser.fulfilled, (state) => {
+          state.loading = false;
+          state.user = null;
+          state.isAuthenticated = false;
+          state.isAdmin = false;
+          state.error = null;
+        })
+        .addCase(logoutUser.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
+        //Fetch User Details
         .addCase(fetchUserDetails.pending, (state) => {
           state.loading = true;
           state.error = null;
