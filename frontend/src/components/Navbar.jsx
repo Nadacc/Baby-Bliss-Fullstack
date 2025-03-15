@@ -61,7 +61,7 @@ function Navbar() {
       <nav className="bg-white shadow-md h-16 flex items-center justify-between px-6 lg:px-8 fixed w-full z-50">
         
         <h1
-          className="font-bold text-2xl lg:text-3xl text-indigo-600 cursor-pointer hover:text-indigo-700 transition duration-300"
+          className="font-bold text-2xl lg:text-3xl text-pink-600 cursor-pointer hover:text-pink-700 transition duration-300"
           onClick={() => navigate('/')}
         >
           Baby Bliss
@@ -88,18 +88,18 @@ function Navbar() {
             />
             <FaSearch
               onClick={handleSearchSubmit}
-              className="text-gray-500 cursor-pointer hover:text-gray-700 transition duration-300"
+              className="text-pink-500 cursor-pointer hover:text-pink-700 transition duration-300"
             />
           </div>
 
           
           <FaHeart
-            className="cursor-pointer hover:text-red-600"
+            className="cursor-pointer hover:text-red-600 text-pink-500"
             onClick={() => navigate('/wishlist')}
           />
 
           
-          <div className="relative cursor-pointer" onClick={() => navigate('/cart')}>
+          <div className="relative text-pink-500 cursor-pointer hover:text-pink-700 transition duration-300" onClick={() => navigate('/cart')}>
             <FaShoppingBasket />
             {cart.length > 0 && (
               <span className="absolute -top-2 -right-2 bg-red-600 text-white text-sm w-5 h-5 flex items-center justify-center rounded-full">
@@ -116,7 +116,7 @@ function Navbar() {
             >
               <div className="flex items-center bg-gray-200 p-2 rounded-full">
                 <FaUser className="text-xl" />
-                {user && <span className="ml-2 text-lg text-gray-700">{user?.username}</span>}
+                {user && <span className="ml-2 text-lg text-pink-700">{user?.username}</span>}
               </div>
             </div>
             {isDropdownOpen && (

@@ -70,7 +70,7 @@ function Products() {
     }
 
     return (
-        <div className="bg-blue-50 min-h-screen">
+        <div className="bg-pink-50 min-h-screen">
             <Navbar />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-24 pb-10 px-6">
                 {loading ? (

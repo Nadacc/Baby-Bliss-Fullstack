@@ -18,13 +18,13 @@ function Home() {
             <Navbar />
 
             
-            <div className="bg-gray-200 py-6 shadow-md pt-12">
+            <div className="bg-pink-100 py-6 shadow-md pt-12">
                 <div className="max-w-7xl mx-auto flex flex-wrap justify-center gap-4 sm:gap-8 text-sm sm:text-lg text-gray-700 mt-8">
                     {categories.map((category, index) => (
                         <Link
                             key={index}
                             to={paths[index]}
-                            className="hover:text-indigo-600 transition duration-300 font-semibold"
+                            className="hover:text-pink-600 transition duration-300 font-semibold"
                         >
                             {category}
                         </Link>
@@ -35,7 +35,7 @@ function Home() {
             
             <div
                 className="relative h-[80vh] sm:h-screen bg-cover bg-center flex items-center justify-center sm:justify-end px-4 sm:px-12"
-                style={{ backgroundImage: "url('backgroundimage.jpg')" }}
+                style={{ backgroundImage: "url('home.jpg')" }}
             >
                 {/* Overlay for subtle effect */}
                 <div className="absolute inset-0 bg-white opacity-10"></div>
